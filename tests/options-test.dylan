@@ -179,3 +179,19 @@ define test test-positional-option-parsing ()
   assert-equal("d", p4.option-value);
   assert-equal(#["e", "f"], p5.option-value);
 end test;
+
+define test test-option-handler ()
+  let opt1-val = 99;
+  let opt1 = make(<flag-option>,
+                  names: "opt1",
+                  help: "h",
+                  handler: method (v) opt1-val := v end);
+  let cmd = make(<command-line-parser>, help: "h", options: list(opt1));
+  assert-no-errors(parse-command-line(cmd, #[]));
+  assert-false(opt1-val, "handler called with default value if option not supplied?");
+  assert-false(opt1.option-value);
+
+  let cmd = make(<command-line-parser>, help: "h", options: list(opt1));
+  assert-no-errors(parse-command-line(cmd, #["--opt1"]));
+  assert-equal(#t, opt1-val);
+end test;
